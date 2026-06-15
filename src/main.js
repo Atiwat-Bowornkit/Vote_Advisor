@@ -30,6 +30,7 @@ class AppState {
     this.selectedAdvisorId = null;
     this.activeTab = 'vote';
     this.searchQuery = '';
+    this.votingOpen = true;
 
     // Cached inputs
     this.studentName = '';
@@ -65,6 +66,12 @@ async function fetchState() {
     const votesData = await votesRes.json();
     if (votesData.success) {
       state.votes = votesData.data;
+    }
+
+    const settingsRes = await fetch('/api/settings');
+    const settingsData = await settingsRes.json();
+    if (settingsData.success) {
+      state.votingOpen = settingsData.data.voting_open;
     }
   } catch (error) {
     createToast("ไม่สามารถดึงข้อมูลจากเซิร์ฟเวอร์กลางได้", "error");
@@ -204,6 +211,11 @@ function renderAdvisorGrid() {
     `;
 
     card.addEventListener('click', () => {
+      if (!state.votingOpen) {
+        createToast("ระบบลงทะเบียนปิดรับโหวตชั่วคราว", "warning");
+        return;
+      }
+
       if (isFull) {
         createToast(`ที่นั่งสำหรับ ${advisor.name} เต็มแล้ว กรุณาเลือกท่านอื่น`, 'warning');
         return;
@@ -462,18 +474,21 @@ function initAppHTML() {
     <header class="app-header">
       <div class="brand">
         <span class="brand-logo">AdvisorSelect</span>
-       
       </div>
       
-      <div class="nav-tabs">
-        <button class="tab-btn active" id="tab-vote-btn">
-          <span style="width: 1rem; height: 1rem; display: inline-flex;">${ICONS.checkCircle}</span>
-          ลงคะแนนโหวต
-        </button>
-        <button class="tab-btn" id="tab-results-btn">
-          <span style="width: 1rem; height: 1rem; display: inline-flex;">${ICONS.stats}</span>
-          ผลคะแนนแบบสด
-        </button>
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <div class="nav-tabs">
+          <button class="tab-btn active" id="tab-vote-btn">
+            <span style="width: 1rem; height: 1rem; display: inline-flex;">${ICONS.checkCircle}</span>
+            ลงคะแนนโหวต
+          </button>
+          <button class="tab-btn" id="tab-results-btn">
+            <span style="width: 1rem; height: 1rem; display: inline-flex;">${ICONS.stats}</span>
+            ผลคะแนนแบบสด
+          </button>
+        </div>
+        
+        <button class="btn-icon" id="theme-toggle-btn" style="border-radius: 12px; width: 38px; height: 38px; cursor: pointer; border: 1px solid var(--border-subtle); display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.03); color: var(--text-secondary);"></button>
       </div>
     </header>
 
@@ -482,6 +497,15 @@ function initAppHTML() {
       
       <!-- TAB 1: VOTING PANEL -->
       <section class="tab-panel active" id="panel-vote">
+        <!-- Voting Closed Alert Banner -->
+        <div id="voting-closed-banner" style="display: none; margin-bottom: 1.5rem; background: var(--color-danger-bg); border: 1px solid rgba(239, 68, 68, 0.3); padding: 1rem 1.25rem; border-radius: 12px; align-items: center; gap: 0.75rem;">
+          <span style="width: 1.5rem; height: 1.5rem; color: var(--color-danger); display: inline-flex; flex-shrink: 0;">${ICONS.alert}</span>
+          <div>
+            <h4 style="color: var(--text-primary); font-weight: 700; margin-bottom: 0.15rem; font-size: 0.9rem;">ระบบปิดรับลงคะแนนชั่วคราว</h4>
+            <p style="color: var(--text-secondary); font-size: 0.8rem; margin: 0; line-height: 1.4;">ผู้ดูแลระบบได้ทำการปิดระบบลงทะเบียนชั่วคราว คุณไม่สามารถทำการเลือกอาจารย์หรือบันทึกข้อมูลได้ในขณะนี้</p>
+          </div>
+        </div>
+
         <div class="voting-grid">
           
           <!-- Student Details Form -->
@@ -760,13 +784,77 @@ function setupEventListeners() {
   });
 }
 
+function updateVotingStatusUI() {
+  const banner = document.getElementById('voting-closed-banner');
+  const nameInput = document.getElementById('student-name');
+  const idInput = document.getElementById('student-id');
+  const submitBtn = document.getElementById('drawer-submit-btn');
+
+  if (!state.votingOpen) {
+    if (banner) banner.style.display = 'flex';
+    if (nameInput) nameInput.disabled = true;
+    if (idInput) idInput.disabled = true;
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `ปิดรับลงทะเบียน <span style="width: 1rem; height: 1rem; display: inline-flex;">${ICONS.alert}</span>`;
+      submitBtn.style.background = 'var(--text-muted)';
+      submitBtn.style.cursor = 'not-allowed';
+      submitBtn.style.boxShadow = 'none';
+    }
+  } else {
+    if (banner) banner.style.display = 'none';
+    if (nameInput) nameInput.disabled = false;
+    if (idInput) idInput.disabled = false;
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `ลงคะแนนเลือก <span style="width: 1rem; height: 1rem; display: inline-flex;">${ICONS.check}</span>`;
+      submitBtn.style.background = '';
+      submitBtn.style.cursor = '';
+      submitBtn.style.boxShadow = '';
+    }
+  }
+}
+
+// Theme Toggle Logic
+function initTheme() {
+  const savedTheme = localStorage.getItem('app-theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  updateThemeToggleButtonUI(savedTheme);
+}
+
+function toggleTheme() {
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', newTheme);
+  localStorage.setItem('app-theme', newTheme);
+  updateThemeToggleButtonUI(newTheme);
+}
+
+function updateThemeToggleButtonUI(theme) {
+  const btn = document.getElementById('theme-toggle-btn');
+  if (!btn) return;
+  if (theme === 'light') {
+    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 1.2rem; height: 1.2rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>`;
+    btn.title = "เปลี่ยนเป็นโหมดมืด (Dark Mode)";
+  } else {
+    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 1.2rem; height: 1.2rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" /></svg>`;
+    btn.title = "เปลี่ยนเป็นโหมดสว่าง (Light Mode)";
+  }
+}
+
 // ==========================================
 // 7. APPLICATION START
 // ==========================================
 
 window.addEventListener('DOMContentLoaded', async () => {
   initAppHTML();
+  initTheme();
   setupEventListeners();
+
+  const themeBtn = document.getElementById('theme-toggle-btn');
+  if (themeBtn) {
+    themeBtn.addEventListener('click', toggleTheme);
+  }
   
   const grid = document.getElementById('advisor-grid');
   if (grid) {
@@ -780,4 +868,5 @@ window.addEventListener('DOMContentLoaded', async () => {
   await fetchState();
   renderAdvisorGrid();
   renderStatsPanel();
+  updateVotingStatusUI();
 });

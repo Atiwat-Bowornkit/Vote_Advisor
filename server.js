@@ -50,7 +50,18 @@ db.exec(`
     timestamp TEXT NOT NULL,
     FOREIGN KEY(advisorId) REFERENCES advisors(id)
   );
+
+  CREATE TABLE IF NOT EXISTS settings (
+    key TEXT PRIMARY KEY,
+    value TEXT
+  );
 `);
+
+// Initialize default settings
+const checkSettings = db.prepare("SELECT COUNT(*) as count FROM settings WHERE key = 'voting_open'").get();
+if (checkSettings.count === 0) {
+  db.prepare("INSERT INTO settings (key, value) VALUES ('voting_open', 'true')").run();
+}
 
 // Insert default advisors if table is empty
 const checkAdvisors = db.prepare('SELECT COUNT(*) as count FROM advisors').get();
@@ -169,6 +180,42 @@ const checkAdminAuth = (req, res, next) => {
 // 3. API ENDPOINTS
 // ==========================================
 
+// Get system settings
+app.get('/api/settings', (req, res) => {
+  try {
+    const settingsList = db.prepare('SELECT * FROM settings').all();
+    const settingsObj = {};
+    settingsList.forEach(s => {
+      settingsObj[s.key] = s.value === 'true' ? true : (s.value === 'false' ? false : s.value);
+    });
+    res.json({ success: true, data: settingsObj });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Update system settings (Protected)
+app.put('/api/admin/settings', checkAdminAuth, (req, res) => {
+  const { voting_open } = req.body;
+
+  if (voting_open === undefined) {
+    return res.status(400).json({ success: false, message: "กรุณาระบุข้อมูลที่ต้องการแก้ไข" });
+  }
+
+  try {
+    db.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('voting_open', ?)")
+      .run(voting_open ? 'true' : 'false');
+
+    res.json({ 
+      success: true, 
+      message: `ระบบลงทะเบียนถูก${voting_open ? 'เปิด' : 'ปิด'}เรียบร้อยแล้ว`,
+      data: { voting_open } 
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 // Get all advisors with live vote counts
 app.get('/api/advisors', (req, res) => {
   try {
@@ -201,6 +248,12 @@ app.get('/api/votes', (req, res) => {
 
 // Submit a student's vote (Transaction to prevent race conditions)
 app.post('/api/votes', (req, res) => {
+  // Check if voting is open
+  const votingOpenSetting = db.prepare("SELECT value FROM settings WHERE key = 'voting_open'").get();
+  if (!votingOpenSetting || votingOpenSetting.value !== 'true') {
+    return res.status(403).json({ success: false, message: "ขออภัย ระบบลงทะเบียนปิดรับโหวตชั่วคราว" });
+  }
+
   const { studentName, studentId, advisorId } = req.body;
 
   if (!studentName || !studentId || !advisorId) {

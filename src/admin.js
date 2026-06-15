@@ -29,6 +29,7 @@ class AdminState {
     this.isAuthenticated = false;
     this.password = sessionStorage.getItem('admin_password') || '';
     this.selectedAdvisorFilter = 'ALL';
+    this.votingOpen = true;
   }
 
   getFilledSlots(advisorId) {
@@ -144,6 +145,12 @@ async function fetchAdminState() {
     if (votesData.success) {
       state.votes = votesData.data;
     }
+
+    const settingsRes = await fetch('/api/settings');
+    const settingsData = await settingsRes.json();
+    if (settingsData.success) {
+      state.votingOpen = settingsData.data.voting_open;
+    }
   } catch (error) {
     createToast("ไม่สามารถดึงข้อมูลระบบได้", "error");
     console.error(error);
@@ -239,10 +246,22 @@ function renderDashboardScreen(container) {
         <span class="brand-tag">🛡️ แอดมิน (วิทยาการคอมพิวเตอร์)</span>
       </div>
       <div class="header-actions">
+        <!-- Voting Status Toggle -->
+        <div style="display: flex; align-items: center; gap: 0.6rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); padding: 0.35rem 0.75rem; border-radius: 10px; margin-right: 0.5rem; backdrop-filter: var(--backdrop-blur);">
+          <span style="font-size: 0.8rem; font-weight: 600; color: ${state.votingOpen ? 'var(--color-success)' : 'var(--color-danger)'};" id="voting-status-text">
+            ระบบโหวต: ${state.votingOpen ? 'เปิดรับโหวต' : 'ปิดรับโหวต'}
+          </span>
+          <label class="switch">
+            <input type="checkbox" id="voting-toggle-checkbox" ${state.votingOpen ? 'checked' : ''}>
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+
         <a href="/" class="btn btn-secondary" style="font-size: 0.85rem;">
           <span style="width: 1rem; height: 1rem; display: inline-flex;">${ICONS.arrowLeft}</span>
           ไปหน้าหลักนักศึกษา
         </a>
+        <button class="btn-icon" id="theme-toggle-btn" style="border-radius: 10px; width: 34px; height: 34px; cursor: pointer; border: 1px solid var(--border-subtle); display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.03); color: var(--text-secondary); margin-right: 0.25rem;"></button>
         <button class="btn btn-danger btn-sm" id="admin-logout-btn">ออกจากระบบ</button>
       </div>
     </header>
@@ -530,6 +549,55 @@ function renderDashboardScreen(container) {
   `;
 
   // Attach Dashboard Event Listeners
+  // Voting status toggle checkbox listener
+  const votingCheckbox = document.getElementById('voting-toggle-checkbox');
+  if (votingCheckbox) {
+    votingCheckbox.addEventListener('change', async (e) => {
+      const open = e.target.checked;
+      
+      const confirmed = await showCustomConfirm(
+        open ? "เปิดระบบโหวต?" : "ปิดระบบโหวต?",
+        open ? "คุณต้องการเปิดระบบลงคะแนนเลือกอาจารย์ที่ปรึกษาใช่หรือไม่?" : "คุณต้องการปิดระบบลงคะแนนเลือกอาจารย์ที่ปรึกษาใช่หรือไม่? นักศึกษาจะไม่สามารถลงโหวตได้ชั่วคราว",
+        { 
+          type: open ? 'info' : 'warning', 
+          confirmText: open ? 'เปิดระบบ' : 'ปิดระบบ', 
+          cancelText: 'ยกเลิก' 
+        }
+      );
+
+      if (confirmed) {
+        try {
+          const res = await fetch('/api/admin/settings', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-admin-password': state.password
+            },
+            body: JSON.stringify({ voting_open: open })
+          });
+
+          const data = await res.json();
+          if (data.success) {
+            state.votingOpen = open;
+            const statusText = document.getElementById('voting-status-text');
+            if (statusText) {
+              statusText.textContent = `ระบบโหวต: ${open ? 'เปิดรับโหวต' : 'ปิดรับโหวต'}`;
+              statusText.style.color = open ? 'var(--color-success)' : 'var(--color-danger)';
+            }
+            createToast(data.message, "success");
+          } else {
+            throw new Error(data.message);
+          }
+        } catch (err) {
+          createToast(err.message, "error");
+          votingCheckbox.checked = !open;
+        }
+      } else {
+        votingCheckbox.checked = !open;
+      }
+    });
+  }
+
   // Logout
   document.getElementById('admin-logout-btn').addEventListener('click', () => {
     state.isAuthenticated = false;
@@ -929,6 +997,40 @@ function renderDashboardScreen(container) {
       }
     });
   }
+
+  // Theme Toggle listener
+  initTheme();
+  const themeBtn = document.getElementById('theme-toggle-btn');
+  if (themeBtn) {
+    themeBtn.addEventListener('click', toggleTheme);
+  }
+}
+
+// Theme Toggle Logic
+function initTheme() {
+  const savedTheme = localStorage.getItem('app-theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  updateThemeToggleButtonUI(savedTheme);
+}
+
+function toggleTheme() {
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', newTheme);
+  localStorage.setItem('app-theme', newTheme);
+  updateThemeToggleButtonUI(newTheme);
+}
+
+function updateThemeToggleButtonUI(theme) {
+  const btn = document.getElementById('theme-toggle-btn');
+  if (!btn) return;
+  if (theme === 'light') {
+    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 1.1rem; height: 1.1rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>`;
+    btn.title = "เปลี่ยนเป็นโหมดมืด (Dark Mode)";
+  } else {
+    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="width: 1.1rem; height: 1.1rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" /></svg>`;
+    btn.title = "เปลี่ยนเป็นโหมดสว่าง (Light Mode)";
+  }
 }
 
 // ==========================================
@@ -936,6 +1038,7 @@ function renderDashboardScreen(container) {
 // ==========================================
 
 window.addEventListener('DOMContentLoaded', async () => {
+  initTheme(); // Set initial theme attribute on documentElement
   if (state.password) {
     try {
       const res = await fetch('/api/admin/login', {
