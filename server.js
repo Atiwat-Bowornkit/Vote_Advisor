@@ -74,73 +74,93 @@ if (checkAdvisors.count === 0) {
   const DEFAULT_ADVISORS = [
     {
       id: "adv-1",
-      name: "ผศ.ดร. อนันต์ สิทธิ์อุดม",
+      name: "นายวรกฤต แสนโภชน์",
       department: "วิทยาการคอมพิวเตอร์",
       avatarGradient: "linear-gradient(135deg, #f43f5e 0%, #f97316 100%)",
       capacity: 15,
-      interests: JSON.stringify(["Artificial Intelligence", "Machine Learning", "NLP"]),
-      email: "anan.si@university.ac.th",
-      imageUrl: null
+      interests: JSON.stringify(["Software Engineering", "System Analysis", "Web Architecture"]),
+      email: "worrakit.sa@up.ac.th",
+      imageUrl: "https://ict.up.ac.th/upload/mem/pictures/pic-111-202312121702354263_69993_44.jpg"
     },
     {
       id: "adv-2",
-      name: "ดร. ณิชาภัทร วงศ์มณี",
+      name: "ผู้ช่วยศาสตราจารย์ ดร.สุรางคนา ระวังยศ",
       department: "วิทยาการคอมพิวเตอร์",
       avatarGradient: "linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)",
       capacity: 15,
-      interests: JSON.stringify(["UX/UI Design", "Web Architecture", "Human-Computer Interaction"]),
-      email: "nichapat.wo@university.ac.th",
-      imageUrl: null
+      interests: JSON.stringify(["Image Processing", "Computer Vision", "Machine Learning"]),
+      email: "surangkana.ra@up.ac.th",
+      imageUrl: "https://ict.up.ac.th/upload/mem/pictures/pic-108-202312121702354252_33941_44.jpg"
     },
     {
       id: "adv-3",
-      name: "รศ.ดร. สมชาย พรประเสริฐ",
+      name: "ผู้ช่วยศาสตราจารย์ ดร.วงษ์ปัญญา นวนแก้ว",
       department: "วิทยาการคอมพิวเตอร์",
       avatarGradient: "linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)",
       capacity: 15,
-      interests: JSON.stringify(["Cybersecurity", "Blockchain Technology", "Cryptography"]),
-      email: "somchai.po@university.ac.th",
-      imageUrl: null
+      interests: JSON.stringify(["Data Science", "Artificial Intelligence", "Information Retrieval"]),
+      email: "wongpanya.nu@up.ac.th",
+      imageUrl: "https://ict.up.ac.th/upload/mem/pictures/pic-114-202312121702354316_26739_44.jpg"
     },
     {
       id: "adv-4",
-      name: "ผศ. กิตติศักดิ์ ศรีสุข",
+      name: "นายธนวัฒน์ แซ่เอียบ",
       department: "วิทยาการคอมพิวเตอร์",
       avatarGradient: "linear-gradient(135deg, #10b981 0%, #3b82f6 100%)",
       capacity: 15,
-      interests: JSON.stringify(["Internet of Things (IoT)", "Embedded Systems", "Smart Agriculture"]),
-      email: "kittisak.sr@university.ac.th",
-      imageUrl: null
+      interests: JSON.stringify(["Web Development", "Database Systems", "Computer Network"]),
+      email: "thanawat.sa@up.ac.th",
+      imageUrl: "https://ict.up.ac.th/upload/mem/pictures/pic-110-202405091725503052_81868_44.png"
     },
     {
       id: "adv-5",
-      name: "ดร. นลินี ไตรวิจิตร",
+      name: "นายเกียรติกุล สุขสมสถาน",
       department: "วิทยาการคอมพิวเตอร์",
       avatarGradient: "linear-gradient(135deg, #f59e0b 0%, #ec4899 100%)",
       capacity: 15,
-      interests: JSON.stringify(["Software Quality Assurance", "Agile Methodologies", "DevOps"]),
-      email: "nalinee.tr@university.ac.th",
-      imageUrl: null
+      interests: JSON.stringify(["Mobile Application", "Interactive Media", "Game Design"]),
+      email: "kiattikul.so@up.ac.th",
+      imageUrl: "https://ict.up.ac.th/upload/mem/pictures/pic-109-202508091757322438_68410_44.png"
     },
     {
       id: "adv-6",
-      name: "ผศ.ดร. ธีรภัทร์ รุ่งเรืองกุล",
+      name: "นายธรรมรัตน์ ธรรมา",
       department: "วิทยาการคอมพิวเตอร์",
       avatarGradient: "linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%)",
       capacity: 15,
-      interests: JSON.stringify(["Cloud Computing", "Network Administration", "Virtualization"]),
-      email: "theerapat.ru@university.ac.th",
-      imageUrl: null
+      interests: JSON.stringify(["Internet of Things (IoT)", "Embedded Systems", "Network Security"]),
+      email: "thammarat.th@up.ac.th",
+      imageUrl: "https://ict.up.ac.th/upload/mem/pictures/pic-113-202312121702354288_59768_44.jpg"
     },
     {
       id: "adv-7",
-      name: "ดร. ปกรณ์ พงษ์ศิริ",
+      name: "นางสาวปวีณา อุ่นลี",
       department: "วิทยาการคอมพิวเตอร์",
       avatarGradient: "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)",
       capacity: 15,
-      interests: JSON.stringify(["Game Development", "Computer Graphics", "VR/AR Applications"]),
-      email: "pakorn.po@university.ac.th",
-      imageUrl: null
+      interests: JSON.stringify(["Human-Computer Interaction", "User Experience (UX)", "Front-End Development"]),
+      email: "paweena.un@up.ac.th",
+      imageUrl: "https://ict.up.ac.th/upload/mem/pictures/pic-1601-202511061749625693_40616_47.jfif"
+    },
+    {
+      id: "adv-8",
+      name: "ดร.ศริทธิ์ พร้อมเทพ",
+      department: "วิทยาการคอมพิวเตอร์",
+      avatarGradient: "linear-gradient(135deg, #14b8a6 0%, #06b6d4 100%)",
+      capacity: 15,
+      interests: JSON.stringify(["Algorithms", "Distributed Systems", "Cloud Computing"]),
+      email: "sarit.pr@up.ac.th",
+      imageUrl: "https://ict.up.ac.th/upload/mem/pictures/pic-1641-202520061750409243_96478_47.jfif"
+    },
+    {
+      id: "adv-9",
+      name: "นายศักดิ์พันธุ์ แดงมณี (ลาศึกษาต่อ)",
+      department: "วิทยาการคอมพิวเตอร์",
+      avatarGradient: "linear-gradient(135deg, #f97316 0%, #eab308 100%)",
+      capacity: 15,
+      interests: JSON.stringify(["Computer Graphics", "Animation", "Virtual Reality"]),
+      email: "sakpan.da@up.ac.th",
+      imageUrl: "https://ict.up.ac.th/upload/mem/pictures/pic-202320061687237066_73134_40-2439.jpg"
     }
   ];
 
