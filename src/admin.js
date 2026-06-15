@@ -71,6 +71,62 @@ function createToast(message, type = 'success') {
   }, 4000);
 }
 
+function showCustomConfirm(title, message, options = {}) {
+  return new Promise((resolve) => {
+    const modalId = 'custom-confirm-modal';
+    let modal = document.getElementById(modalId);
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.className = 'modal-overlay';
+      modal.id = modalId;
+      document.body.appendChild(modal);
+    }
+
+    const {
+      confirmText = 'ยืนยัน',
+      cancelText = 'ยกเลิก',
+      type = 'warning' // 'warning', 'danger', 'info'
+    } = options;
+
+    let iconHtml = ICONS.alert;
+    if (type === 'danger') {
+      iconHtml = ICONS.trash || `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>`;
+    } else if (type === 'info') {
+      iconHtml = ICONS.checkCircle;
+    }
+
+    modal.innerHTML = `
+      <div class="modal-content" style="max-width: 420px; padding: 2rem; text-align: center;">
+        <div class="modal-icon-container ${type}" style="width: 60px; height: 60px; border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem;">
+          <span style="width: 2rem; height: 2rem; display: inline-flex;">${iconHtml}</span>
+        </div>
+        <h3 class="modal-title" style="font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-primary);">${title}</h3>
+        <p class="modal-desc" style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.75rem; line-height: 1.5;">${message}</p>
+        <div class="modal-actions" style="display: flex; gap: 0.5rem; justify-content: center; width: 100%;">
+          <button class="btn btn-secondary" id="custom-confirm-cancel-btn" style="flex: 1; padding: 0.55rem 1rem; font-size: 0.85rem; justify-content: center;">${cancelText}</button>
+          <button class="btn ${type === 'danger' ? 'btn-danger' : 'btn-primary'}" id="custom-confirm-agree-btn" style="flex: 1; padding: 0.55rem 1rem; font-size: 0.85rem; justify-content: center;">${confirmText}</button>
+        </div>
+      </div>
+    `;
+
+    modal.classList.add('show');
+
+    const cleanup = (result) => {
+      modal.classList.remove('show');
+      resolve(result);
+    };
+
+    modal.querySelector('#custom-confirm-cancel-btn').addEventListener('click', () => cleanup(false));
+    modal.querySelector('#custom-confirm-agree-btn').addEventListener('click', () => cleanup(true));
+    
+    modal.onclick = (e) => {
+      if (e.target === modal) {
+        cleanup(false);
+      }
+    };
+  });
+}
+
 // ==========================================
 // 4. API REQUEST CALLS
 // ==========================================
@@ -504,7 +560,12 @@ function renderDashboardScreen(container) {
 
   // Clear Database
   document.getElementById('admin-reset-btn').addEventListener('click', async () => {
-    if (confirm("ต้องการล้างฐานข้อมูลการโหวตทั้งหมดใช่หรือไม่? ข้อมูลจะไม่สามารถกู้คืนกลับมาได้!")) {
+    const confirmed = await showCustomConfirm(
+      "ล้างฐานข้อมูลการโหวต?",
+      "ต้องการล้างฐานข้อมูลการโหวตทั้งหมดใช่หรือไม่? ข้อมูลจะไม่สามารถกู้คืนกลับมาได้!",
+      { type: 'danger', confirmText: 'ล้างข้อมูลทั้งหมด', cancelText: 'ยกเลิก' }
+    );
+    if (confirmed) {
       try {
         const res = await fetch('/api/admin/reset', {
           method: 'POST',
@@ -588,7 +649,12 @@ function renderDashboardScreen(container) {
       const id = btn.dataset.id;
       const name = btn.dataset.name;
 
-      if (confirm(`ต้องการลบคะแนนของ ${name} และคืนสล็อตให้กับอาจารย์ผู้ปรึกษาใช่หรือไม่?`)) {
+      const confirmed = await showCustomConfirm(
+        "คืนสิทธิ์นักศึกษา?",
+        `ต้องการลบคะแนนของ ${name} และคืนสล็อตให้กับอาจารย์ผู้ปรึกษาใช่หรือไม่?`,
+        { type: 'danger', confirmText: 'คืนสิทธิ์', cancelText: 'ยกเลิก' }
+      );
+      if (confirmed) {
         try {
           const res = await fetch(`/api/admin/votes/${id}`, {
             method: 'DELETE',
@@ -651,7 +717,12 @@ function renderDashboardScreen(container) {
       const id = btn.dataset.id;
       const name = btn.dataset.name;
 
-      if (confirm(`คุณต้องการลบอาจารย์ ${name} หรือไม่?\n\n*คำเตือน: การลบนี้จะลบข้อมูลโหวตของนักศึกษาทุกคนที่เลือกอาจารย์ท่านนี้ด้วย!`)) {
+      const confirmed = await showCustomConfirm(
+        "ลบข้อมูลอาจารย์?",
+        `คุณต้องการลบอาจารย์ ${name} หรือไม่?\n\n*คำเตือน: การลบนี้จะลบข้อมูลโหวตของนักศึกษาทุกคนที่เลือกอาจารย์ท่านนี้ด้วย!`,
+        { type: 'danger', confirmText: 'ลบข้อมูลอาจารย์', cancelText: 'ยกเลิก' }
+      );
+      if (confirmed) {
         try {
           const res = await fetch(`/api/admin/advisors/${id}`, {
             method: 'DELETE',

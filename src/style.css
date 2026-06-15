@@ -766,6 +766,17 @@ body::after {
   color: var(--color-success);
 }
 
+.modal-icon-container.danger {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.modal-icon-container.warning {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+}
+
+
 .modal-title {
   font-size: 1.5rem;
   font-weight: 700;
