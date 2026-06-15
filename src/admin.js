@@ -315,7 +315,7 @@ function renderDashboardScreen(container) {
             ส่งออกไฟล์โหวต JSON
           </button>
           
-          <button class="btn btn-secondary" id="admin-reset-btn" style="color: var(--color-danger); border-color: rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.02); margin-left: auto;">
+          <button class="btn btn-secondary" id="admin-reset-btn" style="color: var(--color-danger); border-color: rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.02);">
             <span style="width: 1.1rem; height: 1.1rem; display: inline-flex; color: var(--color-danger);">${ICONS.trash}</span>
             ล้างข้อมูลคะแนนทั้งหมด
           </button>
@@ -323,7 +323,7 @@ function renderDashboardScreen(container) {
       </div>
 
       <!-- Grid Panel splits bar charts and detailed table -->
-      <div class="stats-main-grid" style="grid-template-columns: 350px 1fr;">
+      <div class="admin-main-grid">
         
         <!-- Left: occupancy list & add advisor form -->
         <div style="display: flex; flex-direction: column; gap: 1.5rem;">

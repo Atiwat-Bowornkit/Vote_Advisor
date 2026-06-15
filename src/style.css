@@ -1266,7 +1266,7 @@ body::after {
 /* Responsive adjustements */
 @media (max-width: 640px) {
   #app {
-    padding: 1rem 1rem 7rem;
+    padding: 1rem 1rem 15rem;
   }
   
   .app-header {
@@ -1425,4 +1425,58 @@ input:checked + .switch-slider {
 
 input:checked + .switch-slider:before {
   transform: translateX(22px);
+}
+
+/* ==========================================
+   MOBILE & RESPONSIVE FIXES
+   ========================================== */
+
+/* Sticky Identity Panel behavior on desktop only */
+@media (min-width: 969px) {
+  .student-identity-panel {
+    position: sticky;
+    top: 1.5rem;
+  }
+}
+
+/* Admin Dashboard Main Grid responsive behavior */
+.admin-main-grid {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 2rem;
+}
+
+@media (max-width: 1024px) {
+  .admin-main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Reset database button alignment */
+#admin-reset-btn {
+  margin-left: auto;
+}
+
+@media (max-width: 640px) {
+  #admin-reset-btn {
+    margin-left: 0;
+  }
+}
+
+/* Advisor name text-wrapping on mobile */
+@media (max-width: 640px) {
+  .advisor-name {
+    white-space: normal;
+  }
+}
+
+/* Modal actions vertical stacking on small mobile screens */
+@media (max-width: 400px) {
+  .modal-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .modal-actions button {
+    width: 100%;
+  }
 }

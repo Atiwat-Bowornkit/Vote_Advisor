@@ -241,6 +241,13 @@ function renderAdvisorGrid() {
       });
     }
 
+    const listContainer = card.querySelector('.card-student-list-container');
+    if (listContainer) {
+      listContainer.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+    }
+
     grid.appendChild(card);
   });
 }
@@ -509,7 +516,7 @@ function initAppHTML() {
         <div class="voting-grid">
           
           <!-- Student Details Form -->
-          <div class="glass-panel" style="position: sticky; top: 1.5rem;">
+          <div class="glass-panel student-identity-panel">
             <h2 class="panel-title">
               <span style="width: 1.25rem; height: 1.25rem; display: inline-flex; color: var(--color-primary);">${ICONS.user}</span>
               ข้อมูลผู้ลงคะแนน
