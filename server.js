@@ -78,7 +78,7 @@ if (checkAdvisors.count === 0) {
       department: "วิทยาการคอมพิวเตอร์",
       avatarGradient: "linear-gradient(135deg, #f43f5e 0%, #f97316 100%)",
       capacity: 15,
-      interests: JSON.stringify(["Software Engineering", "System Analysis", "Web Architecture"]),
+      interests: JSON.stringify([]),
       email: "worrakit.sa@up.ac.th",
       imageUrl: "https://ict.up.ac.th/upload/mem/pictures/pic-111-202312121702354263_69993_44.jpg"
     },
@@ -88,7 +88,7 @@ if (checkAdvisors.count === 0) {
       department: "วิทยาการคอมพิวเตอร์",
       avatarGradient: "linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)",
       capacity: 15,
-      interests: JSON.stringify(["Image Processing", "Computer Vision", "Machine Learning"]),
+      interests: JSON.stringify([]),
       email: "surangkana.ra@up.ac.th",
       imageUrl: "https://ict.up.ac.th/upload/mem/pictures/pic-108-202312121702354252_33941_44.jpg"
     },
@@ -98,7 +98,7 @@ if (checkAdvisors.count === 0) {
       department: "วิทยาการคอมพิวเตอร์",
       avatarGradient: "linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)",
       capacity: 15,
-      interests: JSON.stringify(["Data Science", "Artificial Intelligence", "Information Retrieval"]),
+      interests: JSON.stringify([]),
       email: "wongpanya.nu@up.ac.th",
       imageUrl: "https://ict.up.ac.th/upload/mem/pictures/pic-114-202312121702354316_26739_44.jpg"
     },
@@ -108,7 +108,7 @@ if (checkAdvisors.count === 0) {
       department: "วิทยาการคอมพิวเตอร์",
       avatarGradient: "linear-gradient(135deg, #10b981 0%, #3b82f6 100%)",
       capacity: 15,
-      interests: JSON.stringify(["Web Development", "Database Systems", "Computer Network"]),
+      interests: JSON.stringify([]),
       email: "thanawat.sa@up.ac.th",
       imageUrl: "https://ict.up.ac.th/upload/mem/pictures/pic-110-202405091725503052_81868_44.png"
     },
@@ -118,7 +118,7 @@ if (checkAdvisors.count === 0) {
       department: "วิทยาการคอมพิวเตอร์",
       avatarGradient: "linear-gradient(135deg, #f59e0b 0%, #ec4899 100%)",
       capacity: 15,
-      interests: JSON.stringify(["Mobile Application", "Interactive Media", "Game Design"]),
+      interests: JSON.stringify([]),
       email: "kiattikul.so@up.ac.th",
       imageUrl: "https://ict.up.ac.th/upload/mem/pictures/pic-109-202508091757322438_68410_44.png"
     },
@@ -128,7 +128,7 @@ if (checkAdvisors.count === 0) {
       department: "วิทยาการคอมพิวเตอร์",
       avatarGradient: "linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%)",
       capacity: 15,
-      interests: JSON.stringify(["Internet of Things (IoT)", "Embedded Systems", "Network Security"]),
+      interests: JSON.stringify([]),
       email: "thammarat.th@up.ac.th",
       imageUrl: "https://ict.up.ac.th/upload/mem/pictures/pic-113-202312121702354288_59768_44.jpg"
     },
@@ -138,7 +138,7 @@ if (checkAdvisors.count === 0) {
       department: "วิทยาการคอมพิวเตอร์",
       avatarGradient: "linear-gradient(135deg, #6366f1 0%, #a855f7 100%)",
       capacity: 15,
-      interests: JSON.stringify(["Human-Computer Interaction", "User Experience (UX)", "Front-End Development"]),
+      interests: JSON.stringify([]),
       email: "paweena.un@up.ac.th",
       imageUrl: "https://ict.up.ac.th/upload/mem/pictures/pic-1601-202511061749625693_40616_47.jfif"
     },
@@ -148,7 +148,7 @@ if (checkAdvisors.count === 0) {
       department: "วิทยาการคอมพิวเตอร์",
       avatarGradient: "linear-gradient(135deg, #14b8a6 0%, #06b6d4 100%)",
       capacity: 15,
-      interests: JSON.stringify(["Algorithms", "Distributed Systems", "Cloud Computing"]),
+      interests: JSON.stringify([]),
       email: "sarit.pr@up.ac.th",
       imageUrl: "https://ict.up.ac.th/upload/mem/pictures/pic-1641-202520061750409243_96478_47.jfif"
     },
@@ -158,7 +158,7 @@ if (checkAdvisors.count === 0) {
       department: "วิทยาการคอมพิวเตอร์",
       avatarGradient: "linear-gradient(135deg, #f97316 0%, #eab308 100%)",
       capacity: 15,
-      interests: JSON.stringify(["Computer Graphics", "Animation", "Virtual Reality"]),
+      interests: JSON.stringify([]),
       email: "sakpan.da@up.ac.th",
       imageUrl: "https://ict.up.ac.th/upload/mem/pictures/pic-202320061687237066_73134_40-2439.jpg"
     }

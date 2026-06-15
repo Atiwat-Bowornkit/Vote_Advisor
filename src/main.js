@@ -114,8 +114,7 @@ function renderAdvisorGrid() {
 
   const filteredAdvisors = state.advisors.filter(advisor => {
     return advisor.name.toLowerCase().includes(state.searchQuery.toLowerCase()) ||
-      advisor.engName.toLowerCase().includes(state.searchQuery.toLowerCase()) ||
-      advisor.interests.some(interest => interest.toLowerCase().includes(state.searchQuery.toLowerCase()));
+      advisor.engName.toLowerCase().includes(state.searchQuery.toLowerCase());
   });
 
   if (filteredAdvisors.length === 0) {
@@ -174,9 +173,7 @@ function renderAdvisorGrid() {
             <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${advisor.email}">${advisor.email}</span>
           </div>
         </div>
-        <div class="advisor-interests">
-          ${advisor.interests.map(interest => `<span class="interest-tag">${interest}</span>`).join('')}
-        </div>
+
       </div>
       <div class="advisor-slots">
         <div class="slot-header">
@@ -547,7 +544,7 @@ function initAppHTML() {
             <div class="advisor-board-header">
               <div class="search-box" style="max-width: 100%;">
                 <span class="search-icon">${ICONS.search}</span>
-                <input type="text" id="advisor-search" class="search-input" placeholder="ค้นหาอาจารย์วิทยาการคอมพิวเตอร์ ด้วยชื่อหรือหัวข้องานวิจัย..." />
+                <input type="text" id="advisor-search" class="search-input" placeholder="ค้นหาอาจารย์วิทยาการคอมพิวเตอร์ ด้วยชื่อ..." />
               </div>
             </div>
 

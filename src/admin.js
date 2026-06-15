@@ -391,10 +391,7 @@ function renderDashboardScreen(container) {
                 <input type="number" id="new-adv-capacity" class="form-input" value="15" min="1" required style="width: 100%; font-size: 0.85rem;" />
               </div>
 
-              <div class="form-group">
-                <label for="new-adv-interests" style="font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">หัวข้อวิจัย / ความสนใจ (คั่นด้วยจุลภาค \`,\`) *</label>
-                <input type="text" id="new-adv-interests" class="form-input" placeholder="เช่น AI, Machine Learning, IoT" required style="width: 100%; font-size: 0.85rem;" autocomplete="off" />
-              </div>
+
 
               <div class="form-group">
                 <label style="font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">รูปโปรไฟล์อาจารย์</label>
@@ -523,10 +520,7 @@ function renderDashboardScreen(container) {
             <input type="number" id="edit-adv-capacity" class="form-input" min="1" required style="width: 100%; font-size: 0.85rem;" />
           </div>
 
-          <div class="form-group" style="margin-bottom: 0.75rem;">
-            <label for="edit-adv-interests" style="font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">หัวข้อวิจัย / ความสนใจ (คั่นด้วยจุลภาค \`,\`) *</label>
-            <input type="text" id="edit-adv-interests" class="form-input" placeholder="เช่น AI, Machine Learning, IoT" required style="width: 100%; font-size: 0.85rem;" autocomplete="off" />
-          </div>
+
 
           <div class="form-group" style="margin-bottom: 0.75rem;">
             <label style="font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); display: block; margin-bottom: 0.25rem;">รูปโปรไฟล์อาจารย์</label>
@@ -820,9 +814,7 @@ function renderDashboardScreen(container) {
       const name = document.getElementById('new-adv-name').value.trim();
       const email = document.getElementById('new-adv-email').value.trim();
       const capacity = document.getElementById('new-adv-capacity').value.trim();
-      const interestsInput = document.getElementById('new-adv-interests').value.trim();
 
-      const interests = interestsInput.split(',').map(s => s.trim()).filter(Boolean);
 
       try {
         const res = await fetch('/api/admin/advisors', {
@@ -835,7 +827,7 @@ function renderDashboardScreen(container) {
             name,
             email: email || null,
             capacity: parseInt(capacity, 10),
-            interests,
+            interests: [],
             imageUrl: newAdvisorImageBase64 || null
           })
         });
@@ -871,7 +863,7 @@ function renderDashboardScreen(container) {
       document.getElementById('edit-adv-name').value = adv.name;
       document.getElementById('edit-adv-email').value = adv.email || '';
       document.getElementById('edit-adv-capacity').value = adv.capacity;
-      document.getElementById('edit-adv-interests').value = adv.interests.join(', ');
+
 
       const preview = document.getElementById('edit-adv-image-preview');
       const clearBtn = document.getElementById('edit-adv-clear-image-btn');
@@ -963,9 +955,7 @@ function renderDashboardScreen(container) {
       const name = document.getElementById('edit-adv-name').value.trim();
       const email = document.getElementById('edit-adv-email').value.trim();
       const capacity = document.getElementById('edit-adv-capacity').value.trim();
-      const interestsInput = document.getElementById('edit-adv-interests').value.trim();
 
-      const interests = interestsInput.split(',').map(s => s.trim()).filter(Boolean);
 
       try {
         const res = await fetch(`/api/admin/advisors/${id}`, {
@@ -978,7 +968,7 @@ function renderDashboardScreen(container) {
             name,
             email: email || null,
             capacity: parseInt(capacity, 10),
-            interests,
+            interests: [],
             imageUrl: editAdvisorImageBase64 || null
           })
         });

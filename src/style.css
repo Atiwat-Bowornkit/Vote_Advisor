@@ -116,10 +116,7 @@
   border-color: rgba(15, 23, 42, 0.06) !important;
 }
 
-[data-theme="light"] .interest-tag {
-  background: rgba(15, 23, 42, 0.03);
-  border-color: rgba(15, 23, 42, 0.06);
-}
+
 
 
 * {
@@ -635,20 +632,7 @@ body::after {
   color: var(--text-muted);
 }
 
-.advisor-interests {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-}
 
-.interest-tag {
-  font-size: 0.7rem;
-  padding: 0.2rem 0.5rem;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-secondary);
-}
 
 /* Advisor Slot Progress Bar */
 .advisor-slots {
