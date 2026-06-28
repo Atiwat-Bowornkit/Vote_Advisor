@@ -1247,8 +1247,42 @@ body::after {
   color: var(--color-primary);
 }
 
-/* Responsive adjustements */
-@media (max-width: 640px) {
+/* Responsive adjustments & Desktop/Mobile separation */
+@media (min-width: 969px) {
+  .student-panel-content {
+    display: block !important;
+  }
+  .student-panel-summary {
+    display: none !important;
+  }
+  .mobile-toggle-icon {
+    display: none !important;
+  }
+}
+
+@media (max-width: 968px) {
+  .student-identity-panel {
+    transition: all var(--transition-normal);
+    padding: 1.25rem !important;
+  }
+  .student-identity-panel:not(.expanded) .student-panel-content {
+    display: none;
+  }
+  .student-identity-panel:not(.expanded) .student-panel-summary {
+    display: block;
+  }
+  .student-identity-panel.expanded .student-panel-content {
+    display: block;
+  }
+  .student-identity-panel.expanded .student-panel-summary {
+    display: none;
+  }
+  .student-identity-panel.expanded .mobile-toggle-icon {
+    transform: rotate(180deg);
+  }
+}
+
+@media (max-width: 768px) {
   #app {
     padding: 1rem 1rem 15rem;
   }
@@ -1272,12 +1306,128 @@ body::after {
   .admin-drawer {
     width: 100%;
   }
+
+  .advisor-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
   
+  .advisor-card {
+    display: grid !important;
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto auto;
+    gap: 0.5rem 0.75rem;
+    padding: 0.85rem 1rem !important;
+    align-items: center;
+    border-radius: 16px !important;
+    min-height: auto;
+  }
+  
+  .advisor-header {
+    grid-column: 1 / 3;
+    grid-row: 1;
+    margin-bottom: 0 !important;
+    gap: 0.75rem !important;
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .advisor-avatar {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 10px !important;
+    font-size: 1rem !important;
+  }
+  
+  .advisor-name {
+    font-size: 0.95rem !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    margin-bottom: 0 !important;
+  }
+  
+  .advisor-dept {
+    font-size: 0.75rem !important;
+  }
+  
+  .advisor-body {
+    display: none !important;
+  }
+  
+  .advisor-slots {
+    grid-column: 1 / 4;
+    grid-row: 2;
+    margin-top: 0.25rem;
+    border-top: none !important;
+    padding-top: 0 !important;
+  }
+  
+  .slot-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+  }
+  
+  .slot-status {
+    font-size: 0.72rem !important;
+    padding: 0.15rem 0.45rem !important;
+    border-radius: 6px !important;
+  }
+  
+  .slot-bar {
+    height: 6px !important;
+    margin-bottom: 0.25rem !important;
+  }
+  
+  /* Selection indicator circle on mobile cards */
+  .advisor-card::after {
+    content: '';
+    grid-column: 3;
+    grid-row: 1;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2.5px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+    background: rgba(255, 255, 255, 0.02);
+    font-family: var(--font-sans);
+    color: transparent;
+    font-weight: 800;
+    font-size: 0.75rem;
+  }
+  
+  .advisor-card.selected::after {
+    content: '✓';
+    color: #ffffff;
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 10px var(--color-primary-glow);
+  }
+  
+  /* Premium bottom-sheet styling on mobile */
   .selection-drawer {
     flex-direction: column;
     gap: 1rem;
     align-items: stretch;
-    padding: 1rem;
+    padding: 1rem 1.25rem calc(1.25rem + env(safe-area-inset-bottom)) !important;
+    border-radius: 20px 20px 0 0 !important;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  .selection-drawer::before {
+    content: '';
+    width: 36px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+    margin: -0.5rem auto 0.5rem;
+    display: block;
   }
   
   .drawer-details {

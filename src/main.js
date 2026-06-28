@@ -56,27 +56,88 @@ const state = new AppState();
 
 async function fetchState() {
   try {
-    const advRes = await fetch('/api/advisors');
-    const advData = await advRes.json();
-    if (advData.success) {
-      state.advisors = advData.data;
-    }
+    const [advRes, votesRes, settingsRes] = await Promise.all([
+      fetch('/api/advisors').then(r => r.json()),
+      fetch('/api/votes').then(r => r.json()),
+      fetch('/api/settings').then(r => r.json())
+    ]);
 
-    const votesRes = await fetch('/api/votes');
-    const votesData = await votesRes.json();
-    if (votesData.success) {
-      state.votes = votesData.data;
+    if (advRes.success) {
+      state.advisors = advRes.data;
     }
-
-    const settingsRes = await fetch('/api/settings');
-    const settingsData = await settingsRes.json();
-    if (settingsData.success) {
-      state.votingOpen = settingsData.data.voting_open;
+    if (votesRes.success) {
+      state.votes = votesRes.data;
+    }
+    if (settingsRes.success) {
+      state.votingOpen = settingsRes.data.voting_open;
     }
   } catch (error) {
     createToast("ไม่สามารถดึงข้อมูลจากเซิร์ฟเวอร์กลางได้", "error");
     console.error("Fetch state error:", error);
   }
+}
+
+function updateAdvisorSlotsUIOnly() {
+  state.advisors.forEach(advisor => {
+    const card = document.querySelector(`.advisor-card[data-id="${advisor.id}"]`);
+    if (!card) return;
+
+    const filled = state.getFilledSlots(advisor.id);
+    const capacity = advisor.capacity;
+    const remaining = capacity - filled;
+
+    let statusClass = 'available';
+    let statusText = `ว่าง ${remaining} ที่นั่ง`;
+    if (remaining === 0) {
+      statusClass = 'full';
+      statusText = 'เต็มแล้ว';
+    } else if (remaining <= 3) {
+      statusClass = 'warning';
+      statusText = `ใกล้เต็ม (เหลือ ${remaining})`;
+    }
+
+    const isFull = remaining === 0;
+    card.classList.toggle('full-slots', isFull);
+
+    const statusBadge = card.querySelector('.slot-status');
+    if (statusBadge) {
+      statusBadge.className = `slot-status ${statusClass}`;
+      statusBadge.textContent = statusText;
+    }
+
+    const countSpan = card.querySelector('.slot-header span:last-child');
+    if (countSpan) {
+      countSpan.textContent = `${filled}/${capacity} คน`;
+    }
+
+    const barFill = card.querySelector('.slot-bar-fill');
+    if (barFill) {
+      barFill.className = `slot-bar-fill ${statusClass}`;
+      barFill.style.width = `${(filled / capacity) * 100}%`;
+    }
+
+    const assignedStudents = state.votes.filter(v => v.advisorId === advisor.id);
+    const toggleBtn = card.querySelector('.toggle-student-list-btn');
+    if (toggleBtn) {
+      const arrowIndicator = toggleBtn.querySelector('.arrow-indicator');
+      const arrow = arrowIndicator ? arrowIndicator.textContent : '▼';
+      toggleBtn.innerHTML = `รายศึกษา (${assignedStudents.length} คน) <span class="arrow-indicator">${arrow}</span>`;
+    }
+
+    const listContainer = card.querySelector('.card-student-list-container');
+    if (listContainer) {
+      listContainer.innerHTML = assignedStudents.length === 0 
+        ? `<div style="font-size: 0.7rem; color: var(--text-muted); text-align: center;">ยังไม่มีนักศึกษาลงโหวต</div>`
+        : `<ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.3rem; max-height: 100px; overflow-y: auto;">
+            ${assignedStudents.map((s, idx) => `
+              <li style="font-size: 0.7rem; display: flex; justify-content: space-between; color: var(--text-secondary);">
+                <span>${idx + 1}. ${s.studentName}</span>
+                <span style="font-family: monospace; color: var(--text-muted);">${s.studentId}</span>
+              </li>
+            `).join('')}
+           </ul>`;
+    }
+  });
 }
 
 // ==========================================
@@ -222,6 +283,13 @@ function renderAdvisorGrid() {
         state.selectedAdvisorId = null;
       } else {
         state.selectedAdvisorId = advisor.id;
+        // Auto-collapse student details on mobile to keep focus on advisor cards and selection drawer
+        if (window.innerWidth <= 968) {
+          const studentPanel = document.getElementById('student-identity-panel');
+          if (studentPanel) {
+            studentPanel.classList.remove('expanded');
+          }
+        }
       }
       renderAdvisorGrid();
       updateSelectionDrawer();
@@ -513,27 +581,37 @@ function initAppHTML() {
         <div class="voting-grid">
           
           <!-- Student Details Form -->
-          <div class="glass-panel student-identity-panel">
-            <h2 class="panel-title">
-              <span style="width: 1.25rem; height: 1.25rem; display: inline-flex; color: var(--color-primary);">${ICONS.user}</span>
-              ข้อมูลผู้ลงคะแนน
+          <div class="glass-panel student-identity-panel expanded" id="student-identity-panel">
+            <h2 class="panel-title" id="student-panel-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 0; cursor: pointer;">
+              <span style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="width: 1.25rem; height: 1.25rem; display: inline-flex; color: var(--color-primary);">${ICONS.user}</span>
+                ข้อมูลผู้ลงคะแนน
+              </span>
+              <span class="mobile-toggle-icon" style="font-size: 0.8rem; color: var(--text-secondary); transition: transform var(--transition-normal);">▼</span>
             </h2>
             
-            <div class="form-group">
-              <label for="student-name">ชื่อ - นามสกุล</label>
-              <input type="text" id="student-name" class="form-input" placeholder="เช่น นายสมชาย รักเรียน" autocomplete="off" />
+            <div class="student-panel-summary" id="student-panel-summary" style="margin-top: 0.75rem; display: none;">
+              <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.25rem;">ผู้ลงคะแนน: <span id="summary-student-name" style="color: var(--text-primary); font-weight: 600;">ยังไม่ได้ระบุ</span></div>
+              <div style="font-size: 0.85rem; color: var(--text-secondary);">รหัสนักศึกษา: <span id="summary-student-id" style="color: var(--text-primary); font-family: monospace;">ยังไม่ได้ระบุ</span></div>
             </div>
 
-            <div class="form-group">
-              <label for="student-id">รหัสนักศึกษา</label>
-              <input type="text" id="student-id" class="form-input" placeholder="เช่น 66010123" autocomplete="off" />
-            </div>
-
-            <div style="margin-top: 1.5rem; display: flex; align-items: flex-start; gap: 0.5rem; background: rgba(255, 255, 255, 0.02); padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-subtle);">
-              <span style="width: 1.2rem; height: 1.2rem; display: inline-flex; color: var(--text-muted); flex-shrink: 0;">${ICONS.info}</span>
-              <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">
-                กรอกข้อมูลของท่านให้ครบถ้วน จากนั้นเลือกอาจารย์ที่ปรึกษาที่ต้องการทางขวา และกดยืนยันการลงคะแนน (โหวตได้เพียง 1 ครั้งเท่านั้น)
-              </p>
+            <div class="student-panel-content" id="student-panel-content" style="margin-top: 1.25rem;">
+              <div class="form-group">
+                <label for="student-name">ชื่อ - นามสกุล</label>
+                <input type="text" id="student-name" class="form-input" placeholder="เช่น นายสมชาย รักเรียน" autocomplete="off" />
+              </div>
+  
+              <div class="form-group">
+                <label for="student-id">รหัสนักศึกษา</label>
+                <input type="text" id="student-id" class="form-input" placeholder="เช่น 66010123" autocomplete="off" />
+              </div>
+  
+              <div style="margin-top: 1.5rem; display: flex; align-items: flex-start; gap: 0.5rem; background: rgba(255, 255, 255, 0.02); padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                <span style="width: 1.2rem; height: 1.2rem; display: inline-flex; color: var(--text-muted); flex-shrink: 0;">${ICONS.info}</span>
+                <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">
+                  กรอกข้อมูลของท่านให้ครบถ้วน จากนั้นเลือกอาจารย์ที่ปรึกษาที่ต้องการทางขวา และกดยืนยันการลงคะแนน (โหวตได้เพียง 1 ครั้งเท่านั้น)
+                </p>
+              </div>
             </div>
           </div>
 
@@ -765,11 +843,27 @@ function setupEventListeners() {
   const updateDrawerState = () => {
     state.studentName = nameInput.value;
     state.studentId = idInput.value;
+
+    const summaryName = document.getElementById('summary-student-name');
+    const summaryId = document.getElementById('summary-student-id');
+    if (summaryName) summaryName.textContent = state.studentName.trim() || 'ยังไม่ได้ระบุ';
+    if (summaryId) summaryId.textContent = state.studentId.trim() || 'ยังไม่ได้ระบุ';
+
     updateSelectionDrawer();
   };
 
   nameInput.addEventListener('input', updateDrawerState);
   idInput.addEventListener('input', updateDrawerState);
+
+  const studentPanel = document.getElementById('student-identity-panel');
+  const studentPanelTitle = document.getElementById('student-panel-title');
+  if (studentPanel && studentPanelTitle) {
+    studentPanelTitle.addEventListener('click', () => {
+      if (window.innerWidth <= 968) {
+        studentPanel.classList.toggle('expanded');
+      }
+    });
+  }
 
   const searchInput = document.getElementById('advisor-search');
   searchInput.addEventListener('input', (e) => {
@@ -846,7 +940,40 @@ function updateThemeToggleButtonUI(theme) {
 }
 
 // ==========================================
-// 7. APPLICATION START
+// 7. REAL-TIME POLLING SETUP
+// ==========================================
+
+function startStatePolling() {
+  setInterval(async () => {
+    const oldVotingOpen = state.votingOpen;
+    const oldVotesLength = state.votes.length;
+    const oldAdvisorsLength = state.advisors.length;
+    
+    await fetchState();
+    
+    if (state.votingOpen !== oldVotingOpen) {
+      updateVotingStatusUI();
+      if (!state.votingOpen) {
+        state.selectedAdvisorId = null;
+        updateSelectionDrawer();
+      }
+      renderAdvisorGrid(); // Full re-render to reflect disabled/enabled cards
+    } else if (state.advisors.length !== oldAdvisorsLength) {
+      renderAdvisorGrid();
+      if (state.activeTab === 'results') {
+        renderStatsPanel();
+      }
+    } else if (state.votes.length !== oldVotesLength) {
+      updateAdvisorSlotsUIOnly();
+      if (state.activeTab === 'results') {
+        renderStatsPanel();
+      }
+    }
+  }, 2000);
+}
+
+// ==========================================
+// 8. APPLICATION START
 // ==========================================
 
 window.addEventListener('DOMContentLoaded', async () => {
@@ -872,4 +999,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   renderAdvisorGrid();
   renderStatsPanel();
   updateVotingStatusUI();
+
+  // Start real-time sync polling
+  startStatePolling();
 });
