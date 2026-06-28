@@ -1289,9 +1289,11 @@ body::after {
   
   .app-header {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 1rem;
     margin-bottom: 1.5rem;
+    text-align: center;
+    width: 100%;
   }
   
   .nav-tabs {
@@ -1304,6 +1306,16 @@ body::after {
   }
   
   .admin-drawer {
+    width: 100%;
+  }
+
+  .advisor-board-header {
+    justify-content: center !important;
+    width: 100%;
+  }
+
+  .search-box {
+    max-width: 100% !important;
     width: 100%;
   }
 
