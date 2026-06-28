@@ -141,26 +141,6 @@ if (checkAdvisors.count === 0) {
       interests: JSON.stringify([]),
       email: "paweena.un@up.ac.th",
       imageUrl: "https://ict.up.ac.th/upload/mem/pictures/pic-1601-202511061749625693_40616_47.jfif"
-    },
-    {
-      id: "adv-8",
-      name: "ดร.ศริทธิ์ พร้อมเทพ",
-      department: "วิทยาการคอมพิวเตอร์",
-      avatarGradient: "linear-gradient(135deg, #14b8a6 0%, #06b6d4 100%)",
-      capacity: 15,
-      interests: JSON.stringify([]),
-      email: "sarit.pr@up.ac.th",
-      imageUrl: "https://ict.up.ac.th/upload/mem/pictures/pic-1641-202520061750409243_96478_47.jfif"
-    },
-    {
-      id: "adv-9",
-      name: "นายศักดิ์พันธุ์ แดงมณี (ลาศึกษาต่อ)",
-      department: "วิทยาการคอมพิวเตอร์",
-      avatarGradient: "linear-gradient(135deg, #f97316 0%, #eab308 100%)",
-      capacity: 15,
-      interests: JSON.stringify([]),
-      email: "sakpan.da@up.ac.th",
-      imageUrl: "https://ict.up.ac.th/upload/mem/pictures/pic-202320061687237066_73134_40-2439.jpg"
     }
   ];
 
