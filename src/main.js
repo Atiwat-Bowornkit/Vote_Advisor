@@ -723,7 +723,6 @@ function initAppHTML() {
     <!-- Page Footer -->
     <footer class="app-footer">
       <p>© 2026 AdvisorSelect. ระบบโหวตเลือกอาจารย์ที่ปรึกษาส่วนกลาง (วิทยาการคอมพิวเตอร์)</p>
-      <p style="margin-top: 0.25rem;">พัฒนาโดย Antigravity AI Code Companion</p>
     </footer>
   `;
 }
